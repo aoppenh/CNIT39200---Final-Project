@@ -1,0 +1,57 @@
+--List every volunteer over the age of 16.
+SELECT *
+FROM volunteer
+WHERE (sysdate - DOB)/365.25 > 16;
+
+--List all locations on a given road.
+SELECT l.startMile, l.signText
+FROM location l INNER JOIN road r
+ON l.road_roadID = r.roadID
+WHERE r.roadID = 653;
+
+--List each organization and its contact.
+SELECT o.name, c.name
+FROM organization o INNER JOIN contact c
+ON o.organizationID = c.organization_organizationID;
+
+--List each parent, their phone number, and their child.
+SELECT p.parentName, p.phone, v.name as childname
+FROM "Parent/Guardian" p INNER JOIN volunteer v
+ON p.volunteer_volunteerid = v.volunteerid;
+
+--List each adoption and all connected events.
+SELECT a.adoptionNum, a.adoptionDate, e.eventID, e.startDate
+FROM adoption a INNER JOIN event e
+ON a.adoptionNum = e.adoption_adoptionNum;
+
+--Finding every organization that’s adopted a location.
+select name
+from organization
+where organizationID in (select organization_organizationID
+                         from adoption
+                         group by organization_organizationID);
+                         
+--Listing every volunteer under the age of 16.
+select *
+from volunteer
+where (sysdate - DOB)/365.25 < 16;
+
+--Total bags filled at all events within a certain date range.
+select sum(bagsFilled)
+from event
+where startDate between '01-JAN-2019' and '30-APR-2019';
+
+--List all the locations with a length greater than 30 miles.
+select *
+from location
+where (endmile-startmile) > 30;
+
+--Select the event with the most volunteers
+select *
+from event
+where eventID in (select event_eventID
+                  from volunteer_event
+                  group by event_eventID 
+                  having count(*) = (select max(count(*))
+                                     from volunteer_event
+                                     group by event_eventID));
